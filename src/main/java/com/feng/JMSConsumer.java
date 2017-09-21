@@ -28,19 +28,26 @@ public class JMSConsumer {
             //启动连接
             connection.start();
             //创建session
+            //createSession(paramA,paramB)
+            //paramA设置为false时：paramB的值可为Session.AUTO_ACKNOWLEDGE，Session.CLIENT_ACKNOWLEDGE，DUPS_OK_ACKNOWLEDGE其中一个。
+            //paramA设置为true时：paramB的值忽略， acknowledgment mode被jms服务器设置为SESSION_TRANSACTED 。
+            //此处第一个参数设置为true时，必须进行事物提交session.commit,如果为false则不需进行事物提交
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+//            session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
             //创建一个连接HelloWorld的消息队列
             destination = session.createQueue("HelloWorld");
             //创建消息消费者
             messageConsumer = session.createConsumer(destination);
             while (true) {
                 TextMessage textMessage = (TextMessage) messageConsumer.receive(100000);
+//                session.commit();
                 if (null != textMessage) {
                     System.out.println("收到的消息:" + textMessage.getText());
                 } else {
                     break;
                 }
             }
+//            session.commit();
         } catch (JMSException e) {
             e.printStackTrace();
         }
